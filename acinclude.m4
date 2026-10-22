@@ -269,6 +269,9 @@ dnl Fallback to oldest version available
         AC_SUBST(APACHE2_INCLUDES)
         AC_SUBST(APACHE2_HTTPD)
 
+        APACHE2_MODULE_DIR=`$APACHE2_APXS -q exp_libexecdir`
+        AC_SUBST(APACHE2_MODULE_DIR)
+
         AC_SUBST(APACHE1_APXS)
 
         AC_SUBST(APU_CONFIG)

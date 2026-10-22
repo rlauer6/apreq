@@ -1,0 +1,27 @@
+<IfModule mod_env.c>
+    PassEnv PERL5LIB LD_LIBRARY_PATH
+</IfModule>
+
+<IfModule mod_alias.c>
+    ScriptAlias /cgi-bin/ "@ServerRoot@/cgi-bin/"
+</IfModule>
+
+<IfDefine !APACHE2_4>
+<IfModule !mpm_winnt.c>
+   LockFile @ServerRoot@/logs/accept.lock
+</IfModule>
+</IfDefine>
+
+<Directory "@ServerRoot@/cgi-bin">
+   AllowOverride None
+   Options None
+</Directory>
+
+<IfModule !mpm_prefork_module>
+    LoadModule mpm_prefork_module "@APACHE2_MODULE_DIR@/mod_mpm_prefork.so"
+</IfModule>
+
+<IfModule !authz_core_module>
+    LoadModule authz_core_module "@APACHE2_MODULE_DIR@/mod_authz_core.so"
+</IfModule>
+

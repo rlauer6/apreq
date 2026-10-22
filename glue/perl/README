@@ -11,7 +11,23 @@ To run the test suite:
         % make test
 
 
+APACHE TEST CONFIGURATION
 
+The Apache test suites use isolated server configurations managed
+by Apache::Test. These configurations do not necessarily load the
+modules enabled by the system Apache configuration.
+
+During configuration, apxs is used to locate the Apache module
+directory. The test configuration templates conditionally load
+mod_mpm_prefork and mod_authz_core when they are not already loaded.
+
+The generated configuration templates are located at:
+
+    module/t/conf/extra.conf.in
+    glue/perl/t/conf/extra.conf.in
+
+These files are generated during configuration and should not be
+edited directly.
 
 DEVELOPER NOTES
 

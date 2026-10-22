@@ -17,3 +17,11 @@
    Options None
 </Directory>
 
+<IfModule !mpm_prefork_module>
+    LoadModule mpm_prefork_module "/usr/lib/apache2/modules/mod_mpm_prefork.so"
+</IfModule>
+
+<IfModule !authz_core_module>
+    LoadModule authz_core_module "/usr/lib/apache2/modules/mod_authz_core.so"
+</IfModule>
+

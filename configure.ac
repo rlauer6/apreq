@@ -35,4 +35,9 @@ AC_APREQ
 AC_CONFIG_FILES([Makefile include/Makefile library/Makefile library/t/Makefile module/Makefile module/apache2/Makefile glue/Makefile])
 AC_CONFIG_FILES([build/doxygen.conf include/groups.dox])
 AC_CONFIG_FILES([apreq2-config], [chmod +x apreq2-config])
+AC_CONFIG_FILES([
+    module/t/conf/extra.conf.in:build/templates/module/extra.conf.in
+    glue/perl/t/conf/extra.conf.in:build/templates/perl/extra.conf.in
+])
+
 AC_OUTPUT
