@@ -1,4 +1,5 @@
 require 5.006;
+
 use strict;
 use warnings;
 
@@ -22,6 +23,7 @@ undef @opts{
     with-apr-config with-apu-config apxs
     with-expat with-mm-opts)
 };
+
 undef @opts{qw(with-apache2)} if (WIN32);
 
 my @flags = qw/enable-maintainer-mode enable-perl-glue disable-perl-glue/;
@@ -118,11 +120,55 @@ else {
   system($cmd) == 0
     or die "Configuration failed: $?";
 
+  my $meta_file = 'META.yml';
+
+  if ( !-f $meta_file ) {
+    open my $makefile, '<', 'Makefile'
+      or die "Cannot open Makefile: $!";
+
+    my $version;
+
+    while ( my $line = <$makefile> ) {
+      if ( $line =~ /^PACKAGE_VERSION\s*=\s*(\S+)/ ) {
+        $version = $1;
+        last;
+      }
+    }
+
+    close $makefile;
+
+    die 'Cannot determine PACKAGE_VERSION from Makefile'
+      if !defined $version;
+
+    open my $generator, '-|', PERL_PATH, 'build/version_check.pl', "-version=$version"
+      or die "Cannot execute metadata generator: $!";
+    my $tmp_file = "$meta_file.$$";
+
+    open my $output, '>', $tmp_file
+      or die "Cannot create $tmp_file: $!";
+
+    while ( my $line = <$generator> ) {
+      print {$output} $line
+        or die "Cannot write $tmp_file: $!";
+    }
+
+    close $output
+      or die "Cannot close $tmp_file: $!";
+
+    close $generator
+      or die 'Metadata generation failed';
+
+    require CPAN::Meta;
+    CPAN::Meta->load_file($tmp_file);
+
+    rename $tmp_file, $meta_file
+      or die "Cannot rename $tmp_file to $meta_file: $!";
+  }
+
   require CPAN::Meta;
 
-  my $meta = CPAN::Meta->load_file('META.yml');
+  my $meta = CPAN::Meta->load_file($meta_file);
 
   $meta->save('MYMETA.yml');
   $meta->save('MYMETA.json');
-
 }
