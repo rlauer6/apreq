@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+# -*- mode: sh; -*-
+
+set -euo pipefail
+
+tmpdir=$(mktemp -d)
+printf 'Working directory: %s\n' "$tmpdir"
+
+trap 'rm -rf "$tmpdir"' EXIT
+
+git clone -b dev https://github.com/rlauer6/apreq "$tmpdir/apreq"
+
+cd "$tmpdir/apreq"
+
+# Bootstrap cpm.
+mkdir -p local/bin
+cd local/bin
+curl -fsSL \
+    -o cpm \
+    https://github.com/skaji/cpm/releases/latest/download/cpm
+
+chmod +x cpm
+
+export PATH="$tmpdir/apreq/local/bin:$PATH"
+cpm --version
+
+cd "$tmpdir/apreq"
+
+# Install Perl build dependencies.
+cpm install -L local \
+    Apache::Test \
+    mod_perl2 \
+    ExtUtils::XSBuilder
+
+export PERL5LIB="$tmpdir/apreq/local/lib/perl5"
+
+# Generate the build infrastructure from the Git checkout.
+./buildconf
+
+perl Makefile.PL
+
+# Create the CPAN distribution.
+make release
+
+# Verify the release artifact.
+dist=$(ls -1 libapreq2-*.tar.gz)
+
+test -s "$dist"
+
+tar -xOzf "$dist" $(basename $dist .tar.gz)/META.yml > /dev/null
+tar -xOzf "$dist" $(basename $dist .tar.gz)/Makefile.PL > /dev/null
+
+# Test installation from the release artifact.
+# Do not expose the bootstrap library to the installer.
+
+unset PERL5LIB
+
+cpm install -L local2 \
+    Apache::Test \
+    mod_perl2 \
+    ExtUtils::XSBuilder
+
+export PERL5LIB="$tmpdir/apreq/local2/lib/perl5"
+
+cpm install -L local2 \
+    --show-build-log-on-failure \
+    --verbose \
+    "./$dist" 2>&1 | tee /tmp/cpm-build.log
+
+cp "$dist" /tmp

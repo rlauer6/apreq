@@ -1,33 +1,96 @@
-To parse the libapreq headers into xsbuilder/tables:
+PERL BINDINGS FOR LIBAPREQ2
+============================
 
-        % perl ../../build/xsbuilder.pl run
+The Perl bindings are included in the complete libapreq2 distribution.
+This README is for developers modifying the Perl XS implementation.
 
-To build the xs/ directory and configure the tests:
+    ./buildconf
+    perl Makefile.PL
+    make release
 
-        % perl Makefile.PL -apxs /path/to/apache2/bin/apxs        
+Run these commands from the repository root. Neither 'make' nor
+'make test' is required to assemble the tarball.
 
-To run the test suite:
+PERL BUILD DEPENDENCIES
+-----------------------
 
-        % make test
+The Perl bindings require mod_perl2, Apache::Test,
+ExtUtils::MakeMaker, and ExtUtils::XSBuilder. ExtUtils::XSBuilder must
+be available to Perl when running the top-level buildconf script. The
+remaining dependencies are required when configuring, building, or
+testing the Perl bindings.
 
+Dependencies installed into a local library using cpm are not
+automatically added to Perl's module search path.
+
+From the top-level distribution directory:
+
+    cpm install -L local Apache::Test mod_perl2 ExtUtils::XSBuilder
+    export PERL5LIB="$PWD/local/lib/perl5"
+
+Verify that XSBuilder is accessible:
+
+    perl -MExtUtils::XSBuilder -e \
+        'print "$ExtUtils::XSBuilder::VERSION\n"'
+
+This environment is also used when developing the XS bindings
+directly from the glue/perl directory.
+
+Creating a CPAN release does not require manually building or
+testing the XS bindings. The top-level release process handles the
+necessary source generation and packaging. See the top-level README
+for release instructions.
+
+The instructions below are a separate development workflow for working
+directly on the Perl bindings; they are not release prerequisites.
+
+DEVELOPING THE XS BINDINGS
+-------------------------
+
+The top-level build system uses ExtUtils::XSBuilder to generate Perl XS
+sources and MakeMaker files from the libapreq headers. The Perl-specific
+build also uses mod_perl2, Apache::Test, and ExtUtils::MakeMaker.
+
+From glue/perl, to parse the libapreq headers into XSBuilder tables:
+
+    perl ../../build/xsbuilder.pl run
+
+To generate the xs/ directory and configure the Perl tests directly:
+
+    perl Makefile.PL -apxs /path/to/apache2/bin/apxs
+
+To run the Perl test suite from that directory after building:
+
+    make
+    make test
+
+For the complete library, Apache module, and Perl bindings, use the
+repository root instead:
+
+    perl Makefile.PL --with-apache2-apxs=/path/to/apache2/bin/apxs
+    make
+    make test
 
 APACHE TEST CONFIGURATION
+-------------------------
 
-The Apache test suites use isolated server configurations managed
-by Apache::Test. These configurations do not necessarily load the
-modules enabled by the system Apache configuration.
+The Apache::Test suites use isolated server configurations. They do not
+necessarily inherit the modules enabled by the system's regular Apache
+configuration.
 
-During configuration, apxs is used to locate the Apache module
-directory. The test configuration templates conditionally load
-mod_mpm_prefork and mod_authz_core when they are not already loaded.
+During configuration, apxs supplies the Apache module directory. The
+test templates conditionally load mod_mpm_prefork and mod_authz_core if
+they are not already loaded. These settings apply to both the Apache
+module tests and the Perl XS tests.
 
-The generated configuration templates are located at:
+The generated templates are:
 
     module/t/conf/extra.conf.in
     glue/perl/t/conf/extra.conf.in
 
-These files are generated during configuration and should not be
-edited directly.
+Their authoritative source templates are stored under build/templates/
+at the repository root. Edit those source templates, not the generated
+files in the test directories.
 
 DEVELOPER NOTES
 

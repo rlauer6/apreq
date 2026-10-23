@@ -1,7 +1,7 @@
 /** @page apreq_changes CHANGES
 @brief List of major changes.
 
-@subsubsection v2_18 Changes with libapreq2-2.18 (in development)
+@subsubsection v2_18 Changes with libapreq2-2.18 (released 23 October, 2026)
 
 - Multipart parser
   Allow empty part "name" and "filename" (restore v2.16 behaviour).
@@ -15,7 +15,8 @@
   load the MPM and authorization modules required by Apache::Test.
   Support Apache installations that do not statically link these modules.
 
-- Generate configuration-time CPAN metadata to support standard CPAN
+- CPAN packaging
+  Generate configuration-time CPAN metadata to support standard CPAN
   installation clients.
 
 @subsubsection v2_17 Changes with libapreq2-2.17 (released 25 August, 2022)
