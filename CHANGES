@@ -1,6 +1,11 @@
 /** @page apreq_changes CHANGES
 @brief List of major changes.
 
+@subsubsection v2_19 Changes with libapreq2-2.19 (released 05 Novemeber, 2026)
+
+- Perl build
+  pass prefix to configure
+
 @subsubsection v2_18 Changes with libapreq2-2.18 (released 23 October, 2026)
 
 - Multipart parser

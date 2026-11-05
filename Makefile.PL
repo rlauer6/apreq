@@ -21,7 +21,7 @@ undef @opts{
   qw(with-apache2-apxs with-apache1-apxs with-apache2-src
     with-perl with-apache2-httpd
     with-apr-config with-apu-config apxs
-    with-expat with-mm-opts)
+    with-expat with-mm-opts prefix)
 };
 
 undef @opts{qw(with-apache2)} if (WIN32);
@@ -169,6 +169,5 @@ else {
 
   my $meta = CPAN::Meta->load_file($meta_file);
 
-  $meta->save('MYMETA.yml');
   $meta->save('MYMETA.json');
 }
